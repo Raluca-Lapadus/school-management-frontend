@@ -20,3 +20,12 @@ export const deleteTeachersAPI = async (id: number) => {
     return;
   }
 };
+
+export const addTeacherAPI = async (body: {}) => {
+    try {
+      const response = await API.post(`${baseURL}/addTeacher`, body);
+      return response.data;
+    } catch (error) {
+      return;
+    }
+  };
