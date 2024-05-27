@@ -103,7 +103,6 @@ const Attendance: React.FC = () => {
     try {
       const subjects = await getSubjectsAPI();
       setSubjects(subjects);
-      console.log(subjects);
     } finally {
       setIsLoading(false);
     }
