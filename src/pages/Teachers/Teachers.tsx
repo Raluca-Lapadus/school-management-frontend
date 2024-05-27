@@ -57,6 +57,7 @@ const Teachers: React.FC = () => {
       try {
         await addTeacherAPI(values);
         getTeachers();
+        setInfoBanner('Successfully added!', 'Success')
       } finally {
         setIsLoading(false);
       }
@@ -72,7 +73,6 @@ const Teachers: React.FC = () => {
     try {
       const teachers = await getTeachersAPI();
       setTeachers(teachers);
-      console.log(teachers);
     } finally {
       setIsLoading(false);
     }
@@ -82,7 +82,6 @@ const Teachers: React.FC = () => {
     try {
       const res = await getSubjectsAPI();
       setSubjects(res);
-      console.log(res);
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +91,7 @@ const Teachers: React.FC = () => {
     try {
       await deleteTeachersAPI(id);
       getTeachers();
+      setInfoBanner('Successfully deleted!', 'Success')
     } catch (error: any) {
       setInfoBanner("There is an error", "Error");
     }

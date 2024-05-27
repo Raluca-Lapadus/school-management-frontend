@@ -62,6 +62,7 @@ const Attendance: React.FC = () => {
           values.studentId
         );
         getAttendances(values.studentId, values.subjectId);
+        setInfoBanner('Successfully added!', 'Success')
       } finally {
         setIsLoading(false);
       }
@@ -93,7 +94,6 @@ const Attendance: React.FC = () => {
     try {
       const res = await getAttendancesAPI(studentId, subjectId);
       setAttendances(res);
-      console.log(res);
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +113,6 @@ const Attendance: React.FC = () => {
     try {
       const students = await getStudentsAPI();
       setStudents(students);
-      console.log(students);
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +127,7 @@ const Attendance: React.FC = () => {
         newAtt.splice(idx, 1);
       }
       setAttendances([...newAtt]);
+      setInfoBanner('Successfully deleted!', 'Success')
     } catch (error: any) {
       setInfoBanner("There is an error", "Error");
     }
@@ -143,13 +143,6 @@ const Attendance: React.FC = () => {
     setRowsPerPage(+event.target.value);
     setCurrentPage(0);
   };
-
-  // const handleFilter = async (value: string) => {
-  //   setChosenSubject(value);
-  //   const res = await getTeachersAPI();
-  //   const newTeachers = res.filter((teacher: {subject: {name: string}}) => teacher.subject.name === value);
-  //   setTeachers(newTeachers);
-  // }
 
   if (isLoading) return <Loader />;
 
