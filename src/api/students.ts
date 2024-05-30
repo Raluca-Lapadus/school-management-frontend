@@ -13,3 +13,12 @@ export const getStudentsAPI = async () => {
     return;
   }
 };
+
+export const addStudentAPI = async (body: {}) => {
+  try {
+    const response = await API.post(`${baseURL}/addStudent`, body);
+    return response.data;
+  } catch (error) {
+    return;
+  }
+};
