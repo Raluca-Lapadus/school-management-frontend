@@ -14,53 +14,44 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useEffect, useState } from "react";
-import {
-  addTeacherAPI,
-  deleteTeachersAPI,
-  getTeachersAPI,
-} from "../../api/teachers";
 import Loader from "../../components/Loader/Loader";
 import { useErrorStore } from "../../stores/error-store/error.store";
 import { useFormik } from "formik";
-import { getSubjectsAPI } from "../../api/subjects";
 import * as Yup from "yup";
-import classes from "./TeacherD.module.scss";
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import classes from "./Students.module.scss";
+import { addStudentAPI, getStudentsAPI } from "../../api/students";
 
-export const AddTeacherValidationSchema = Yup.object().shape({
+export const AddStudentValidationSchema = Yup.object().shape({
   firstName: Yup.string().required("Required"),
   lastName: Yup.string().max(30, "Too Long!").required("Required"),
-  numberOfOlympics: Yup.number().required("Required"),
-  yearsOfExperience: Yup.number().required("Required"),
-  subjectId: Yup.number().required("Required"),
+  email: Yup.string().required("Required"),
+  profile: Yup.string().required("Required"),
+  age: Yup.number().required("Required"),
 });
 
-const Teachers: React.FC = () => {
+const Students: React.FC<{getStudentIdForGrade: (id: number) => void}> = ({getStudentIdForGrade}) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [teachers, setTeachers] = useState([]);
-  const [subjects, setSubjects] = useState([]);
+  const [students, setStudents] = useState([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const { setInfoBanner } = useErrorStore();
-  const [chosenSubject, setChosenSubject] = useState<string>('');
 
   const formik = useFormik({
     initialValues: {
       lastName: "",
       firstName: "",
-      numberOfOlympics: "",
-      yearsOfExperience: "",
-      subjectId: 0,
+      profile: 0,
+      email: "",
+      age: 0,
     },
-    validationSchema: AddTeacherValidationSchema,
+    validationSchema: AddStudentValidationSchema,
     onSubmit: async (values) => {
       try {
-        await addTeacherAPI(values);
-        getTeachers();
-        setInfoBanner('Successfully added!', 'Success')
+        await addStudentAPI(values);
+        getStudents();
+        setInfoBanner("Successfully added!", "Success");
       } finally {
         setIsLoading(false);
       }
@@ -68,35 +59,15 @@ const Teachers: React.FC = () => {
   });
 
   useEffect(() => {
-    getTeachers();
-    getSubjects();
+    getStudents();
   }, [currentPage, rowsPerPage]);
 
-  const getTeachers = async () => {
+  const getStudents = async () => {
     try {
-      const teachers = await getTeachersAPI();
-      setTeachers(teachers);
+      const teachers = await getStudentsAPI();
+      setStudents(teachers);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const getSubjects = async () => {
-    try {
-      const res = await getSubjectsAPI();
-      setSubjects(res);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const deleteTeacher = async (id: number) => {
-    try {
-      await deleteTeachersAPI(id);
-      getTeachers();
-      setInfoBanner('Successfully deleted!', 'Success')
-    } catch (error: any) {
-      setInfoBanner("There is an error", "Error");
     }
   };
 
@@ -111,11 +82,8 @@ const Teachers: React.FC = () => {
     setCurrentPage(0);
   };
 
-  const handleFilter = async (value: string) => {
-    setChosenSubject(value);
-    const res = await getTeachersAPI();
-    const newTeachers = res.filter((teacher: {subject: {name: string}}) => teacher.subject.name === value);
-    setTeachers(newTeachers);
+  const getStudentId = (id: number) => {
+    getStudentIdForGrade(id);
   }
 
   if (isLoading) return <Loader />;
@@ -123,7 +91,7 @@ const Teachers: React.FC = () => {
   return (
     <div className={classes.containerPage}>
       <div className={classes.containerAddTeacher}>
-        <Typography variant="h4">Add teacher <AddCircleIcon /></Typography>
+        <Typography variant="h4">Add student <AddCircleIcon /></Typography>
         <form>
           <div className={classes.container}>
             <TextField
@@ -149,45 +117,41 @@ const Teachers: React.FC = () => {
               onBlur={formik.handleBlur}
             />
             <TextField
-              id="numberOfOlympics"
+              id="age"
               fullWidth
-              label="Number of olympics"
+              label="Age"
               required
               type="number"
               variant="outlined"
-              name={"numberOfOlympics"}
-              value={formik.values.numberOfOlympics || ""}
+              name={"age"}
+              value={formik.values.age || ""}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
             <TextField
-              id="yearsOfExperience"
+              id="email"
               fullWidth
-              label="Years of experience"
+              label="Email"
               required
-              type="number"
               variant="outlined"
-              name={"yearsOfExperience"}
-              value={formik.values.yearsOfExperience || ""}
+              name={"email"}
+              value={formik.values.email || ""}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
             <FormControl fullWidth>
-              <InputLabel id="subjectId">Subject</InputLabel>
+              <InputLabel id="profile">Profile</InputLabel>
               <Select
-                labelId="subjectId"
-                id="subjectId"
-                value={formik.values.subjectId || ""}
-                label="Subject"
+                labelId="profile"
+                id="profile"
+                value={formik.values.profile || ""}
+                label="Profile"
                 onChange={(ev) =>
-                  formik.setFieldValue("subjectId", ev?.target.value)
+                  formik.setFieldValue("profile", ev?.target.value)
                 }
               >
-                {subjects.map((subject: { id: number; name: string }) => (
-                  <MenuItem key={subject.id} value={subject.id}>
-                    {subject.name}
-                  </MenuItem>
-                ))}
+                <MenuItem value={"0"}>Real</MenuItem>
+                <MenuItem value={"1"}>Uman</MenuItem>
               </Select>
             </FormControl>
 
@@ -204,37 +168,18 @@ const Teachers: React.FC = () => {
           </div>
         </form>
       </div>
-      <div className={classes.containerFilters}>
-      <Typography variant="h4">Filter teachers <FilterAltIcon /></Typography>
-        <FormControl fullWidth>
-          <InputLabel id="subjectId">Subject</InputLabel>
-          <Select
-            labelId="subjectId"
-            id="subjectId"
-            value={chosenSubject || ""}
-            label="Subject"
-            onChange={(ev) => handleFilter(ev.target.value)}
-          >
-            {subjects.map((subject: { id: number; name: string }) => (
-              <MenuItem key={subject.id} value={subject.name}>
-                {subject.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </div>
       <TableContainer>
-        <Typography variant="h3">Teachers</Typography>
+        <Typography variant="h3">Students</Typography>
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>Years of experience</TableCell>
               <TableCell>First Name</TableCell>
               <TableCell>Last Name</TableCell>
-              <TableCell>Number of olympics</TableCell>
-              <TableCell>Subject</TableCell>
-              <TableCell>Delete</TableCell>
+              <TableCell>Profile</TableCell>
+              <TableCell>Age</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Grades</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -246,32 +191,32 @@ const Teachers: React.FC = () => {
               </TableRow>
             ) : (
               <>
-                {teachers.length === 0 && (
+                {students.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={7} align="center">
                       There is no data
                     </TableCell>
                   </TableRow>
                 )}
-                {teachers
+                {students
                   .slice(
                     currentPage * rowsPerPage,
                     currentPage * rowsPerPage + rowsPerPage
                   )
-                  .map((teacher: any) => (
-                    <TableRow key={teacher.id}>
-                      <TableCell>{teacher.id}</TableCell>
-                      <TableCell>{teacher.yearsOfExperience}</TableCell>
-                      <TableCell>{teacher.firstName}</TableCell>
-                      <TableCell>{teacher.lastName}</TableCell>
-                      <TableCell>{teacher.numberOfOlympics}</TableCell>
-                      <TableCell>{teacher.subject?.name || "null"}</TableCell>
+                  .map((student: any) => (
+                    <TableRow key={student.id}>
+                      <TableCell>{student.id}</TableCell>
+                      <TableCell>{student.firstName}</TableCell>
+                      <TableCell>{student.lastName}</TableCell>
+                      <TableCell>{student.profile}</TableCell>
+                      <TableCell>{student.age}</TableCell>
+                      <TableCell>{student.email}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"
-                          onClick={() => deleteTeacher(teacher.id)}
+                          onClick={() => getStudentId(student.id)}
                         >
-                          <DeleteIcon /> Delete
+                          Grades
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -284,7 +229,7 @@ const Teachers: React.FC = () => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={teachers?.length || 0}
+        count={students?.length || 0}
         rowsPerPage={rowsPerPage}
         page={currentPage}
         onPageChange={handleChangePage}
@@ -293,4 +238,4 @@ const Teachers: React.FC = () => {
     </div>
   );
 };
-export default Teachers;
+export default Students;

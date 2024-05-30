@@ -1,8 +1,19 @@
-import { Typography } from "@mui/material";
+import { useState } from "react";
+import PageLayout from "../../layouts/PageLayout";
+import Grades from "./Grades";
+import Students from "./Students";
 
-const TeacherD: React.FC = () => {
-    return (
-        <Typography>Students</Typography>
-    );
+const StudentsDashboard: React.FC = () => {
+  const [studentId, setStudentId] = useState<number | null>(null);
+
+  const getStudentIdForGrade = (id: number) =>{
+    setStudentId(id);
+  }
+  return (
+    <PageLayout>
+      <Students getStudentIdForGrade={getStudentIdForGrade} />
+      <Grades studentId={studentId} />
+    </PageLayout>
+  );
   };
-export default TeacherD;
+export default StudentsDashboard;

@@ -21,12 +21,14 @@ import { useFormik } from "formik";
 import { getSubjectsAPI } from "../../api/subjects";
 import * as Yup from "yup";
 import classes from "./TeacherD.module.scss";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {
   addAttendanceAPI,
   deleteAttendanceAPI,
   getAttendancesAPI,
 } from "../../api/attendance";
 import { getStudentsAPI } from "../../api/students";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export const AddAttendanceValidationSchema = Yup.object().shape({
   date: Yup.string().required("Required"),
@@ -148,7 +150,7 @@ const Attendance: React.FC = () => {
   return (
     <div className={classes.containerPage}>
       <div className={classes.containerAddTeacher}>
-        <Typography variant="h4">Add absence</Typography>
+        <Typography variant="h4">Add absence <AddCircleIcon /></Typography>
         <form>
           <div className={classes.container}>
             <FormControl fullWidth>
@@ -324,7 +326,7 @@ const Attendance: React.FC = () => {
                           variant="contained"
                           onClick={() => deleteAttendance(attendance.id)}
                         >
-                          Delete
+                          <DeleteIcon /> Delete
                         </Button>
                       </TableCell>
                     </TableRow>
